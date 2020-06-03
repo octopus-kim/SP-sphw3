@@ -2,25 +2,35 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
+#include <wait.h>
 
 int main(int argc, char **argv)
 {
-    int cmd_len, count;
-    int temp, i, j;
+    int bg_flag, cmd_len, count, child_pid, status;
+    int i;
     char *ptr;
     char **cmd;
+
     if (argc == 1) {
 
     }
-    else if (argc == 3) {
+
+    else if (argc == 3 || argc == 4) {
         if (strcmp(argv[1], "-c") != 0) {
-            printf("Usage : %s [-c] [commend]\n", argv[0]); return -1;
+            printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
+        }
+
+        bg_flag = 0;
+        if (strcmp(argv[3], "&") != 0) {
+            printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
+        } else {
+            bg_flag = 1;
         }
 
         cmd_len = strlen(argv[2]);
         count = 1;
         for (i = 0; i < cmd_len; i++) {
-            if (strncmp(argv[2], " ", 1) == 0) count++;
+            if (argv[2][i] == ' ') count++;
         }
 
         cmd = (char**)malloc(sizeof(char*) * count);
@@ -30,17 +40,24 @@ int main(int argc, char **argv)
         i = 0;
         ptr = strtok(argv[2], " ");
         while (ptr != NULL) {
-            printf("%s\n", ptr);
             strcpy(cmd[i], ptr);
             ptr = strtok(NULL, " ");
             i++;
         }
 
-        for (i = 0; i < count; i++)
-            printf("%s\n", cmd[i]);
-    } else {
-        printf("Usage : %s [-c] [commend]\n", argv[0]); return -1;
+        child_pid = fork();
+        if (child_pid == 0) {
+            execlp(cmd[[0], cmd], 0);
+        } else {
+            if (bg_flag == 0) {
+                waitpid(child_pid, &status, 0);
+            } else if (bg_flag == 1) {
+                waitpid(child_pid, &status, WNOHANG);
+            }
+        }
     }
 
-    return 0;
+    else {
+        printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
+    }
 }
