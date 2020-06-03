@@ -19,7 +19,7 @@ int main(int argc, char **argv)
         cmd_len = strlen(argv[2]);
         count = 1;
         for (i = 0; i < cmd_len; i++) {
-            if (strcmp(argv[2][i], " ") == 0) count++;
+            if (strncmp(argv[2], " ", 1) == 0) count++;
         }
 
         cmd = (char**)malloc(sizeof(char*) * count);
@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 
         temp = 0; j = 0;
         for (i = 0; i < cmd_len; i++) {
-            if (strcmp(argv[2][i], " ") != 0) {
+            if (strncmp(argv[2], " ", 1) != 0) {
                 j++; temp = 0; continue;
             }
             cmd[j][temp] = argv[2][i];
