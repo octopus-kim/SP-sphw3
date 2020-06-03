@@ -7,6 +7,7 @@ int main(int argc, char **argv)
 {
     int cmd_len, count;
     int temp, i, j;
+    char *ptr;
     char **cmd;
     if (argc == 1) {
 
@@ -24,7 +25,9 @@ int main(int argc, char **argv)
 
         i = 0;
         cmd = (char**)malloc(sizeof(char*) * count);
-        char *ptr = strtok(argv[2], " ");
+        for (i = 0; i < count; i++)
+            cmd[i] = (char*)malloc(sizeof(char) * 16);
+        ptr = strtok(argv[2], " ");
         while (ptr != NULL) {
             printf("%s\n", ptr);
             strcpy(cmd[i], ptr);
