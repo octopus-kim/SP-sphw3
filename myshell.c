@@ -1,18 +1,15 @@
 #include <stdio.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <string.h>
 
 int main(int argc, char **argv)
 {
-    int i = 0;
     // myshell -c [arg] [arg] ...
     if (argc > 1) {
         // check argument
-        if (argv[1] != "-c") {
-            printf("Usage : %s -c [arg] [arg] ...\n", argv[0]);
-            for (i = 0; i < argc; i++)
-                printf("%s\n", argv[i]);
-            return -1;
+        if (strcmp(argv[1], "-c") != 0) {
+            printf("Usage : %s -c [arg] [arg] ...\n", argv[0]); return -1;
         }
         printf("%d arg\n", argc - 1);
     }
@@ -21,4 +18,6 @@ int main(int argc, char **argv)
     else {
         printf("0 arg\n");
     }
+
+    return 0;
 }
