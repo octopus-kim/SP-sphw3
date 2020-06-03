@@ -22,17 +22,13 @@ int main(int argc, char **argv)
             if (strncmp(argv[2], " ", 1) == 0) count++;
         }
 
+        i = 0;
         cmd = (char**)malloc(sizeof(char*) * count);
-        for (i = 0; i < count; i++)
-            cmd[i] = (char*)malloc(sizeof(char) * 10);
-
-        temp = 0; j = 0;
-        for (i = 0; i < cmd_len; i++) {
-            if (strncmp(argv[2], " ", 1) != 0) {
-                j++; temp = 0; continue;
-            }
-            cmd[j][temp] = argv[2][i];
-            temp++;
+        char *ptr = strtok(argv[2], " ");
+        while (ptr != NULL) {
+            printf("%s\n", ptr);
+            strcpy(cmd[i], ptr);
+            ptr = strtok(NULL, " ");
         }
 
         for (i = 0; i < count; i++)
