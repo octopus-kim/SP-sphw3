@@ -21,10 +21,12 @@ int main(int argc, char **argv)
         }
 
         bg_flag = 0;
-        if (strcmp(argv[3], "&") != 0) {
-            printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
-        } else {
-            bg_flag = 1;
+        if (argc == 4) {
+            if (strcmp(argv[3], "&") != 0) {
+                printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
+            } else {
+                bg_flag = 1;
+            }
         }
 
         cmd_len = strlen(argv[2]);
@@ -47,7 +49,7 @@ int main(int argc, char **argv)
 
         child_pid = fork();
         if (child_pid == 0) {
-            execlp(cmd[[0], cmd], 0);
+            execlp(cmd[0], cmd, 0);
         } else {
             if (bg_flag == 0) {
                 waitpid(child_pid, &status, 0);
