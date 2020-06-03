@@ -43,11 +43,12 @@ int main(int argc, char **argv)
 
         child_pid = fork();
         if (child_pid == 0) {
-            execlp(cmd[0], cmd[0], cmd[1], cmd[2], 0);
+            execvp(cmd[0], cmd);
         } else {
             if (bg_flag == 0) {
                 waitpid(child_pid, &status, 0);
-                return 0;
+                free(cmd[0]);
+                free(cmd);
             } else if (bg_flag == 1) {
                 waitpid(child_pid, &status, WNOHANG);
                 return 0;
@@ -58,4 +59,6 @@ int main(int argc, char **argv)
     else {
         printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
     }
+
+    return 0;
 }
