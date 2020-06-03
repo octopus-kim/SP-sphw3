@@ -4,21 +4,17 @@
 
 int main(int argc, char **argv)
 {
-    while(1) {
-        int i = 0;
-        char **cmd;
-        printf("$ ");
-
-        for (i = 0; i < argc; i++) {
-            cmd[i] = argv[i]
+    // myshell -c [arg] [arg] ...
+    if (argc > 1) {
+        // check argument
+        if (argv[1] != "-c") {
+            printf("Usage : %s -c [arg] [arg] ...\n", argv[0]); return -1;
         }
+        printf("%d arg\n", argc - 1);
+    }
 
-        int child_pid = fork();
-        if (child_pid == 0) {
-            execlp(cmd[0], cmd[0], cmd[1], cmd[2]);
-            printf("exec failed\n");
-        } else {
-            waitpid(child_pid);
-        }
+    // myshell
+    else {
+        printf("0 arg\n");
     }
 }
