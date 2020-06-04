@@ -15,13 +15,14 @@
 // > < | & 2> ;
 void simple_shell(char **cmd, int count)
 {
-    int i, j, k = 0;
+    int i, j, temp, k = 0;
 
     for (i = 0; i < count; i++) {
         if (strcmp(cmd[i], ">") == 0) {
-            const char *arr[i - k + 1];
-            arr[i - k] = NULL;
-            for (j = 0; j < i - k; j++) {
+            temp = i - k;
+            const char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
@@ -29,9 +30,10 @@ void simple_shell(char **cmd, int count)
             k = i + 1;
         }
         if (strcmp(cmd[i], "<") == 0) {
-            const char *arr[i - k + 1];
-            arr[i - k] = NULL;
-            for (j = 0; j < i - k; j++) {
+            temp = i - k;
+            const char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
@@ -39,9 +41,10 @@ void simple_shell(char **cmd, int count)
             k = i + 1;
         }
         if (strcmp(cmd[i], "2>") == 0) {
-            const char *arr[i - k + 1];
-            arr[i - k] = NULL;
-            for (j = 0; j < i - k; j++) {
+            temp = i - k;
+            const char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
@@ -49,9 +52,10 @@ void simple_shell(char **cmd, int count)
             k = i + 1;
         }
         if (strcmp(cmd[i], "|") == 0) {
-            const char *arr[i - k + 1];
-            arr[i - k] = NULL;
-            for (j = 0; j < i - k; j++) {
+            temp = i - k;
+            const char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
@@ -59,9 +63,10 @@ void simple_shell(char **cmd, int count)
             k = i + 1;
         }
         if (strcmp(cmd[i], "&") == 0) {
-            const char *arr[i - k + 1];
-            arr[i - k] = NULL;
-            for (j = 0; j < i - k; j++) {
+            temp = i - k;
+            const char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
@@ -69,9 +74,10 @@ void simple_shell(char **cmd, int count)
             k = i + 1;
         }
         if (strcmp(cmd[i], ";") == 0) {
-            const char *arr[i - k + 1];
-            arr[i - k] = NULL;
-            for (j = 0; j < i - k; j++) {
+            temp = i - k;
+            const char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
