@@ -6,7 +6,7 @@
 
 int main(int argc, char **argv)
 {
-    int bg_flag, cmd_len, count, child_pid, status;
+    int cmd_len, count, child_pid, status;
     int i;
     char *ptr;
     char **cmd;
@@ -42,25 +42,14 @@ int main(int argc, char **argv)
             i++;
         }
 
-        if (strcmp(cmd[count - 1], "&") == 0) bg_flag = 1;
-        else bg_flag = 0;
-
-        child_pid = fork();
-        if (child_pid == 0) {
-            execlp(cmd[0], cmd[0], cmd[1], 0);
-        } else {
-            if (bg_flag == 0) {
-                waitpid(child_pid, &status, 0);
-            } else if (bg_flag == 1) {
-                waitpid(child_pid, &status, WNOHANG);
-                return 0;
-            }
-        }
+        for (i = 0; i < count; i++)
+            printf("%s\n", cmd[i]);
+        return 0;
     }
 
     else {
         printf("Usage : %s [-c] [commend] [&]\n", argv[0]); return -1;
     }
 
-    return 0;
+
 }
