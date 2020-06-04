@@ -18,9 +18,30 @@ int main(int argc, char **argv)
             fgets(s_ptr, MAXSIZE, stdin);
 
             if (feof(stdin)) {
-                printf("\nexit program normally\n"); return 0;
+                printf("CTRL + D\nexit program normally\n"); return 0;
             }
-            printf("%s", s_ptr);
+
+            cmd_len = strlen(s_ptr);
+            count = 1;
+            for (i = 0; i < cmd_len; i++) {
+                if (s_ptr[i] == ' ') count++;
+            }
+
+            cmd = (char**)malloc(sizeof(char*) * count);
+            for (i = 0; i < count; i++)
+                cmd[i] = (char*)malloc(sizeof(char) * MAXSIZE);
+
+            i = 0;
+            d_ptr = strtok(s_ptr, " ");
+            while (d_ptr != NULL) {
+                strcpy(cmd[i], d_ptr);
+                d_ptr = strtok(NULL, " ");
+                i++;
+            }
+
+            for (i = 0; i < count; i++)
+                printf("%s\n", cmd[i]);
+            return 0;
         }
     }
 
