@@ -6,19 +6,19 @@
 
 int main(int argc, char **argv)
 {
-    int cmd_len, count, child_pid, status;
-    int i;
-    char s_ptr[16];
+    int cmd_len, count, child_pid, status, i;
+    int MAXSIZE = 64;
+    char s_ptr[MAXSIZE];
     char *d_ptr;
     char **cmd;
 
     if (argc == 1) {
         while(1) {
             printf("$ ");
-            fgets(s_ptr, 16, stdin);
+            if (feof(stdin) && fgets(s_ptr, MAXSIZE, stdin)) {
+                printf("\nexit program normally\n"); return 0;
+            }
 
-            if (s_ptr[0] == EOF)
-                printf("EOF\n");
             printf("%s", s_ptr);
         }
     }
@@ -36,7 +36,7 @@ int main(int argc, char **argv)
 
         cmd = (char**)malloc(sizeof(char*) * count);
         for (i = 0; i < count; i++)
-            cmd[i] = (char*)malloc(sizeof(char) * 16);
+            cmd[i] = (char*)malloc(sizeof(char) * MAXSIZE);
 
         i = 0;
         d_ptr = strtok(argv[2], " ");
