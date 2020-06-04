@@ -10,12 +10,16 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <string.h>
-#include <wait.h>
+#include <sys/wait.h>
 
 // > < | & 2> ;
 void simple_shell(char **cmd, int count)
 {
-    int i, j, temp, k = 0;
+    int i, j, temp, bg_flag, k = 0;
+    int child_pid, status;
+
+    if (strcmp(cmd[count - 1], "&") != 0) bg_flag = 0;
+    else bg_flag = 1;
 
     for (i = 0; i < count; i++) {
         if (strcmp(cmd[i], ">") == 0) {
@@ -29,6 +33,7 @@ void simple_shell(char **cmd, int count)
             }
             k = i + 1;
         }
+
         if (strcmp(cmd[i], "<") == 0) {
             temp = i - k;
             const char *arr[temp + 1];
@@ -40,6 +45,7 @@ void simple_shell(char **cmd, int count)
             }
             k = i + 1;
         }
+
         if (strcmp(cmd[i], "2>") == 0) {
             temp = i - k;
             const char *arr[temp + 1];
@@ -51,6 +57,7 @@ void simple_shell(char **cmd, int count)
             }
             k = i + 1;
         }
+
         if (strcmp(cmd[i], "|") == 0) {
             temp = i - k;
             const char *arr[temp + 1];
@@ -62,17 +69,7 @@ void simple_shell(char **cmd, int count)
             }
             k = i + 1;
         }
-        if (strcmp(cmd[i], "&") == 0) {
-            temp = i - k;
-            const char *arr[temp + 1];
-            arr[temp] = NULL;
-            for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k];
-                printf("arr[%d] -> %s\n", j, arr[j]);
-                k++;
-            }
-            k = i + 1;
-        }
+
         if (strcmp(cmd[i], ";") == 0) {
             temp = i - k;
             const char *arr[temp + 1];
@@ -83,6 +80,19 @@ void simple_shell(char **cmd, int count)
                 k++;
             }
             k = i + 1;
+
+            if ((child_pid = fork()) < 0) {
+                printf("fork() failed in argument (;)\n"); return;
+            }
+            if (child_pid == 0) {
+                execvp(arr[0], arr);
+                printf("exec() failed in argument (;)\n"); return;
+            } else {
+                if (bg_flag == 0)
+                    waitpid(child_pid, &status, 0);
+                else if (bg_flag == 1)
+                    waitpid(child_pid, &status, WNOHANG);
+            }
         }
     }
 }
@@ -106,7 +116,7 @@ int main(int argc, char *argv[])
                 printf("CTRL + D\nexit program normally\n"); return 0;
             }
 
-            // Count argument's number
+            // Count input argument's number
             cmd_len = strlen(s_ptr);
             count = 1;
             for (i = 0; i < cmd_len; i++) {
