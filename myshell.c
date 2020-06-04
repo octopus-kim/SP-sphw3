@@ -8,14 +8,15 @@ int main(int argc, char **argv)
 {
     int cmd_len, count, child_pid, status;
     int i;
-    char *ptr;
+    char s_ptr[16];
+    char *d_ptr;
     char **cmd;
 
     if (argc == 1) {
         while(1) {
             printf("$ ");
-            scanf("%s", ptr);
-            printf("%s\n", ptr);
+            scanf("%s", s_ptr);
+            printf("%s\n", s_ptr);
         }
     }
 
@@ -35,10 +36,10 @@ int main(int argc, char **argv)
             cmd[i] = (char*)malloc(sizeof(char) * 16);
 
         i = 0;
-        ptr = strtok(argv[2], " ");
-        while (ptr != NULL) {
-            strcpy(cmd[i], ptr);
-            ptr = strtok(NULL, " ");
+        d_ptr = strtok(argv[2], " ");
+        while (d_ptr != NULL) {
+            strcpy(cmd[i], d_ptr);
+            d_ptr = strtok(NULL, " ");
             i++;
         }
 
