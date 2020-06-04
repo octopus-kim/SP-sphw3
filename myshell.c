@@ -15,10 +15,11 @@ int main(int argc, char **argv)
     if (argc == 1) {
         while(1) {
             printf("$ ");
-            gets(s_ptr);
+            fgets(s_ptr, 16, stdin);
 
-            if (strcmp(s_ptr, EOF) == 0) return 0;
-            printf("%s\n", s_ptr);
+            if (s_ptr[0] == EOF)
+                printf("EOF\n");
+            printf("%s", s_ptr);
         }
     }
 
