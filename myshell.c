@@ -15,10 +15,11 @@ int main(int argc, char **argv)
     if (argc == 1) {
         while(1) {
             printf("$ ");
-            if (feof(stdin) && fgets(s_ptr, MAXSIZE, stdin)) {
+            fgets(s_ptr, MAXSIZE, stdin);
+
+            if (feof(stdin)) {
                 printf("\nexit program normally\n"); return 0;
             }
-
             printf("%s", s_ptr);
         }
     }
