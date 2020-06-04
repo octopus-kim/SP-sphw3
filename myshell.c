@@ -20,62 +20,62 @@ void simple_shell(char **cmd, int count)
     for (i = 0; i < count; i++) {
         if (strcmp(cmd[i], ">") == 0) {
             const char *arr[i - k + 1];
+            arr[i - k] = NULL;
             for (j = 0; j < i - k; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
             }
-            arr[i - k] = NULL;
             k = i + 1;
         }
         if (strcmp(cmd[i], "<") == 0) {
             const char *arr[i - k + 1];
+            arr[i - k] = NULL;
             for (j = 0; j < i - k; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
             }
-            arr[i - k] = NULL;
             k = i + 1;
         }
         if (strcmp(cmd[i], "2>") == 0) {
             const char *arr[i - k + 1];
+            arr[i - k] = NULL;
             for (j = 0; j < i - k; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
             }
-            arr[i - k] = NULL;
             k = i + 1;
         }
         if (strcmp(cmd[i], "|") == 0) {
             const char *arr[i - k + 1];
+            arr[i - k] = NULL;
             for (j = 0; j < i - k; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
             }
-            arr[i - k] = NULL;
             k = i + 1;
         }
         if (strcmp(cmd[i], "&") == 0) {
             const char *arr[i - k + 1];
+            arr[i - k] = NULL;
             for (j = 0; j < i - k; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
             }
-            arr[i - k] = NULL;
             k = i + 1;
         }
         if (strcmp(cmd[i], ";") == 0) {
             const char *arr[i - k + 1];
+            arr[i - k] = NULL;
             for (j = 0; j < i - k; j++) {
                 arr[j] = cmd[k];
                 printf("arr[%d] -> %s\n", j, arr[j]);
                 k++;
             }
-            arr[i - k] = NULL;
             k = i + 1;
         }
     }
