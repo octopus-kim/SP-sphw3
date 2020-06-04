@@ -15,7 +15,9 @@ int main(int argc, char **argv)
     if (argc == 1) {
         while(1) {
             printf("$ ");
-            scanf("%s", s_ptr);
+            gets(s_ptr);
+
+            if (strcmp(s_ptr, EOF) == 0) return 0;
             printf("%s\n", s_ptr);
         }
     }
