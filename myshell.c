@@ -25,7 +25,7 @@ void stderr_2 () {
 }
 
 // > < | & 2> ;
-void simple_shell(char **cmd, int count)
+int simple_shell(char **cmd, int count)
 {
     int i, j, temp, bg_flag, out, err, k = 0;
     int child_pid, status, fd_out, fd_err;
@@ -48,12 +48,12 @@ void simple_shell(char **cmd, int count)
             for ( k = i; k < count; k += 2) {
                 if (strcmp(cmd[k], ">") == 0) {
                     if ((k + 1) >= count) {
-                        printf("stdout failed in argument (>)\n"); return;
+                        printf("stdout failed in argument (>)\n"); return -1;
                     } out = k + 1;
                 }
                 else if (strcmp(cmd[k], "2>") == 0) {
                     if ((k + 1) >= count) {
-                        printf("stderr failed in argument (2>)\n"); return;
+                        printf("stderr failed in argument (2>)\n"); return -1;
                     } err = k + 1;
                 }
                 else if (strcmp(cmd[k], ";") == 0) {
@@ -63,24 +63,24 @@ void simple_shell(char **cmd, int count)
 
             printf("out, err : %d, %d\n", out, err);
             if ((child_pid = fork()) < 0) {
-                printf("fork() failed in argument (> or 2>)\n"); return;
+                printf("fork() failed in argument (> or 2>)\n"); return -1;
             }
             if (child_pid == 0) {
                 if (out >= 0) {
-                    if ((fd_out = open(cmd[out], O_WRONLY)) < 0) {
-                        printf("open() failed in argument (>)\n"); return;
+                    if ((fd_out = open(cmd[out], O_WRONLY | O_CREAT, 644)) < 0) {
+                        printf("open() failed in argument (>)\n"); return -1;
                     }
                     close(1); dup(fd_out); close(fd_out);
                 }
                 if (err >= 0) {
-                    if ((fd_err = open(cmd[err], O_WRONLY)) < 0) {
-                        printf("open() failed in argument (2>)\n"); return;
+                    if ((fd_err = open(cmd[err], O_WRONLY | O_CREAT, 644)) < 0) {
+                        printf("open() failed in argument (2>)\n"); return -1;
                     }
                     close(2); dup(fd_err); close(fd_err);
                 }
 
                 execvp(arr[0], arr);
-                printf("exec() failed in argument (> or 2>)\n"); return;
+                printf("exec() failed in argument (> or 2>)\n"); return -1;
             } else {
                 if (bg_flag == 0)
                     waitpid(child_pid, &status, 0);
@@ -116,11 +116,11 @@ void simple_shell(char **cmd, int count)
             } k = i + 1;
 
             if ((child_pid = fork()) < 0) {
-                printf("fork() failed in argument (;)\n"); return;
+                printf("fork() failed in argument (;)\n"); return -1;
             }
             if (child_pid == 0) {
                 execvp(arr[0], arr);
-                printf("exec() failed in argument (;)\n"); return;
+                printf("exec() failed in argument (;)\n"); return -1;
             } else {
                 if (bg_flag == 0)
                     waitpid(child_pid, &status, 0);
@@ -129,7 +129,7 @@ void simple_shell(char **cmd, int count)
             }
         }
         i++;
-    }
+    } return 0;
 }
 
 int main(int argc, char *argv[])
@@ -174,7 +174,9 @@ int main(int argc, char *argv[])
             while (cmd[count - 1][i] != '\n') i++;
             cmd[count - 1][i] = '\0';
 
-            simple_shell(cmd, count);
+            if (simple_shell(cmd, count) < 0) {
+                return -1;
+            }
         }
     }
 
@@ -205,7 +207,9 @@ int main(int argc, char *argv[])
             i++;
         }
 
-        simple_shell(cmd, count);
+        if (simple_shell(cmd, count) < 0) {
+            return -1;
+        }
         return 0;
     }
 
