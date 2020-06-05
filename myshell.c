@@ -12,6 +12,15 @@
 #include <string.h>
 #include <sys/wait.h>
 
+void stdout_1 ()
+{
+
+}
+
+void stderr_2 () {
+
+}
+
 // > < | & 2> ;
 void simple_shell(char **cmd, int count)
 {
@@ -19,67 +28,102 @@ void simple_shell(char **cmd, int count)
     int child_pid, status;
 
     if (strcmp(cmd[count - 1], "&") != 0) bg_flag = 0;
-    else bg_flag = 1;
+    else { bg_flag = 1; count--; }
 
-    for (i = 0; i < count; i++) {
-        if (strcmp(cmd[i], ">") == 0) {
+    i = 0;
+    while (i < count) {
+        // Redirection argument : >
+        if (strcmp(cmd[i], ">") == 0 || strcmp(cmd[i], "2>") == 0) {
             temp = i - k;
-            const char *arr[temp + 1];
+            char *arr[temp + 1];
             arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k];
-                printf("arr[%d] -> %s\n", j, arr[j]);
-                k++;
-            }
-            k = i + 1;
-        }
+                arr[j] = cmd[k]; k++;
+            } k = i + 1;
 
-        if (strcmp(cmd[i], "<") == 0) {
-            temp = i - k;
-            const char *arr[temp + 1];
-            arr[temp] = NULL;
-            for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k];
-                printf("arr[%d] -> %s\n", j, arr[j]);
-                k++;
+            int out, err;
+            out = err = -1;
+            while (strcmp(cmd[k], ">") == 0 || strcmp(cmd[k], "2>") == 0 || strcmp(cmd[k], ";") == 0) {
+                if (strcmp(cmd[k], ">") == 0)
+                    if (k + 1 >= count) {
+                        printf("stdout() failed in argument (>)\n"); return;
+                    }
+                    out = k + 1;
+                if (strcmp(cmd[k], "2>") == 0)
+                    if (k + 1 >= count) {
+                        printf("stdout() failed in argument (>)\n"); return;
+                    }
+                    err = k + 1;
+                if (strcmp(cmd[k], ";") == 0) {
+                    i = k; k += 1; break;
+                } k += 2;
+                if (k >= count) { i = k; break; }
             }
-            k = i + 1;
+
+            if ((child_pid = fork()) < 0) {
+                printf("fork() failed in argument (>)\n"); return;
+            }
+            if (child_pid == 0) {
+                FILE *fd_out, *fd_err;
+                if (out >= 0) {
+                    if ((fd_out = fopen(cmd[out], "w")) == NULL) {
+                        printf("fopen() failed in argument (>)\n");
+                        return;
+                    }
+                    close(stdout); dup(fd_out); close(fd_out);
+                }
+                if (err >= 0) {
+                    if ((fd_err = fopen(cmd[err], "w")) == NULL) {
+                        printf("fopen() failed in argument (>)\n");
+                        return;
+                    }
+                    clode(stderr); dup(fd_err); close(fd_err);
+                }
+
+                execvp(arr[0], arr);
+                printf("exec() failed in argument (>)\n"); return;
+            } else {
+                if (bg_flag == 0)
+                    waitpid(child_pid, &status, 0);
+                else if (bg_flag == 1)
+                    waitpid(child_pid, &status, WNOHANG);
+            }
         }
 
         if (strcmp(cmd[i], "2>") == 0) {
             temp = i - k;
-            const char *arr[temp + 1];
+            char *arr[temp + 1];
             arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k];
-                printf("arr[%d] -> %s\n", j, arr[j]);
-                k++;
-            }
-            k = i + 1;
+                arr[j] = cmd[k]; k++;
+            } k = i + 1;
+        }
+
+        if (strcmp(cmd[i], "<") == 0) {
+            temp = i - k;
+            char *arr[temp + 1];
+            arr[temp] = NULL;
+            for (j = 0; j < temp; j++) {
+                arr[j] = cmd[k]; k++;
+            } k = i + 1;
         }
 
         if (strcmp(cmd[i], "|") == 0) {
             temp = i - k;
-            const char *arr[temp + 1];
+            char *arr[temp + 1];
             arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k];
-                printf("arr[%d] -> %s\n", j, arr[j]);
-                k++;
-            }
-            k = i + 1;
+                arr[j] = cmd[k]; k++;
+            } k = i + 1;
         }
 
         if (strcmp(cmd[i], ";") == 0) {
             temp = i - k;
-            const char *arr[temp + 1];
+            char *arr[temp + 1];
             arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k];
-                printf("arr[%d] -> %s\n", j, arr[j]);
-                k++;
-            }
-            k = i + 1;
+                arr[j] = cmd[k]; k++;
+            } k = i + 1;
 
             if ((child_pid = fork()) < 0) {
                 printf("fork() failed in argument (;)\n"); return;
@@ -94,6 +138,7 @@ void simple_shell(char **cmd, int count)
                     waitpid(child_pid, &status, WNOHANG);
             }
         }
+        i++;
     }
 }
 
