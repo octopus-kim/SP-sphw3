@@ -42,10 +42,10 @@ void simple_shell(char **cmd, int count)
             arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k]; k++;
-            } k = i;
+            }
 
             out = err = -1;
-            while (strcmp(cmd[k], ">") == 0 || strcmp(cmd[k], "2>") == 0 || strcmp(cmd[k], ";") == 0) {
+            for ( k = i; k < count; k += 2) {
                 if (strcmp(cmd[k], ">") == 0) {
                     if ((k + 1) >= count) {
                         printf("stdout failed in argument (>)\n"); return;
@@ -57,12 +57,11 @@ void simple_shell(char **cmd, int count)
                     } err = k + 1;
                 }
                 else if (strcmp(cmd[k], ";") == 0) {
-                    i = k; k += 1; break;
+                    k += 1; break;
                 }
-                k += 2;
-                if (k >= count) { i = k; break; }
-            }
+            } i = k - 1;
 
+            printf("out, err : %d, %d\n", out, err);
             if ((child_pid = fork()) < 0) {
                 printf("fork() failed in argument (> or 2>)\n"); return;
             }
