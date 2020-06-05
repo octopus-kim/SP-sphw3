@@ -259,6 +259,16 @@ int simple_shell(char **cmd, int count)
                 execvp(b_arr[0], b_arr);
                 fprintf(stderr, "exec() failed in argument (|)\n"); return -1;
             }
+
+            close(fd_pipe[0]); close(fd_pipe[1]);
+            if (bg_flag == 0) {
+                waitpid(child_pid0, &status, 0);
+                waitpid(child_pid1, &status, 0);
+            }
+            else if (bg_flag == 1) {
+                waitpid(child_pid0, &status, WNOHANG);
+                waitpid(child_pid1, &status, WNOHANG);
+            }
         }
 
         else if (strcmp(cmd[i], ";") == 0) {
