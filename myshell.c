@@ -28,7 +28,7 @@ void stderr_2 () {
 void simple_shell(char **cmd, int count)
 {
     int i, j, temp, bg_flag, out, err, k = 0;
-    int child_pid, status;
+    int child_pid, status, fd_out, fd_err;
 
     if (strcmp(cmd[count - 1], "&") != 0) bg_flag = 0;
     else { bg_flag = 1; count--; }
@@ -42,23 +42,24 @@ void simple_shell(char **cmd, int count)
             arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
                 arr[j] = cmd[k]; k++;
-            } k = i + 1;
+            } k = i;
 
             out = err = -1;
             while (strcmp(cmd[k], ">") == 0 || strcmp(cmd[k], "2>") == 0 || strcmp(cmd[k], ";") == 0) {
                 if (strcmp(cmd[k], ">") == 0) {
-                    if (k + 1 >= count) {
+                    if ((k + 1) >= count) {
                         printf("stdout failed in argument (>)\n"); return;
                     } out = k + 1;
                 }
-                if (strcmp(cmd[k], "2>") == 0) {
-                    if (k + 1 >= count) {
+                else if (strcmp(cmd[k], "2>") == 0) {
+                    if ((k + 1) >= count) {
                         printf("stderr failed in argument (2>)\n"); return;
                     } err = k + 1;
                 }
-                if (strcmp(cmd[k], ";") == 0) {
+                else if (strcmp(cmd[k], ";") == 0) {
                     i = k; k += 1; break;
-                } k += 2;
+                }
+                k += 2;
                 if (k >= count) { i = k; break; }
             }
 
@@ -66,18 +67,15 @@ void simple_shell(char **cmd, int count)
                 printf("fork() failed in argument (> or 2>)\n"); return;
             }
             if (child_pid == 0) {
-                int fd_out, fd_err;
                 if (out >= 0) {
                     if ((fd_out = open(cmd[out], O_WRONLY)) < 0) {
-                        printf("open() failed in argument (>)\n");
-                        return;
+                        printf("open() failed in argument (>)\n"); return;
                     }
                     close(1); dup(fd_out); close(fd_out);
                 }
                 if (err >= 0) {
                     if ((fd_err = open(cmd[err], O_WRONLY)) < 0) {
-                        printf("open() failed in argument (2>)\n");
-                        return;
+                        printf("open() failed in argument (2>)\n"); return;
                     }
                     close(2); dup(fd_err); close(fd_err);
                 }
@@ -92,7 +90,7 @@ void simple_shell(char **cmd, int count)
             }
         }
 
-        if (strcmp(cmd[i], "<") == 0) {
+        else if (strcmp(cmd[i], "<") == 0) {
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
@@ -101,7 +99,7 @@ void simple_shell(char **cmd, int count)
             } k = i + 1;
         }
 
-        if (strcmp(cmd[i], "|") == 0) {
+        else if (strcmp(cmd[i], "|") == 0) {
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
@@ -110,7 +108,7 @@ void simple_shell(char **cmd, int count)
             } k = i + 1;
         }
 
-        if (strcmp(cmd[i], ";") == 0) {
+        else if (strcmp(cmd[i], ";") == 0) {
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
