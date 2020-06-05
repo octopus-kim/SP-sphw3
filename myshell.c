@@ -27,16 +27,18 @@ void stderr_2 () {
 // > < | & 2> ;
 int simple_shell(char **cmd, int count)
 {
-    int i, j, temp, bg_flag, out, err, k = 0;
+    int i, j, temp, out, err, k = 0;
     int child_pid, status, fd_out, fd_err;
+    int bg_flag, arg_flag;
 
     if (strcmp(cmd[count - 1], "&") != 0) bg_flag = 0;
     else { bg_flag = 1; count--; }
 
-    i = 0;
+    arg_flag = i = 0;
     while (i < count) {
         // Redirection argument : >
         if (strcmp(cmd[i], ">") == 0 || strcmp(cmd[i], "2>") == 0) {
+            arg_flag = 1;
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
@@ -67,7 +69,6 @@ int simple_shell(char **cmd, int count)
                 }
             } i = k - 1;
 
-            printf("out, err : %d, %d\n", out, err);
             if ((child_pid = fork()) < 0) {
                 fprintf(stderr, "fork() failed in argument (> or 2>)\n"); return -1;
             }
@@ -96,6 +97,7 @@ int simple_shell(char **cmd, int count)
         }
 
         else if (strcmp(cmd[i], "<") == 0) {
+            arg_flag = 1;
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
@@ -105,6 +107,7 @@ int simple_shell(char **cmd, int count)
         }
 
         else if (strcmp(cmd[i], "|") == 0) {
+            arg_flag = 1;
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
@@ -114,6 +117,7 @@ int simple_shell(char **cmd, int count)
         }
 
         else if (strcmp(cmd[i], ";") == 0) {
+            arg_flag = 1;
             temp = i - k;
             char *arr[temp + 1];
             arr[temp] = NULL;
@@ -135,6 +139,27 @@ int simple_shell(char **cmd, int count)
             }
         }
         i++;
+    }
+
+    if (arg_flag == 0) {
+        char *arr[count + 1];
+        arr[count] = NULL;
+        for (i = 0; i < count; i++) {
+            arr[i] = cmd[i];
+        }
+
+        if ((child_pid = fork()) < 0) {
+            fprintf(stderr, "fork() failed in argument (none)\n"); return -1;
+        }
+        if (child_pid == 0) {
+            execvp(arr[0], arr);
+            fprintf(stderr, "exec() failed in argument (none)\n"); return -1;
+        } else {
+            if (bg_flag == 0)
+                waitpid(child_pid, &status, 0);
+            else if (bg_flag == 1)
+                waitpid(child_pid, &status, WNOHANG);
+        }
     } return 0;
 }
 
