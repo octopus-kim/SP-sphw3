@@ -212,7 +212,7 @@ int simple_shell(char **cmd, int count)
             }
 
             temp = i + 1;
-            while (strcmp(cmd[temp], ";") != 0 || strcmp(cmd[temp], ">") != 0 || strcmp(cmd[temp], "2>") != 0) {
+            while (strcmp(cmd[temp], ";") != 0 && strcmp(cmd[temp], ">") != 0 && strcmp(cmd[temp], "2>") != 0) {
                 temp++;
                 if (temp == count) break;
             }
@@ -222,6 +222,7 @@ int simple_shell(char **cmd, int count)
             b_arr[temp] = NULL;
             for (j = 0; j < temp; j++) {
                 b_arr[j] = cmd[i + 1]; i++;
+                printf("%s\n", b_arr[j]);
             } i = k - 1;
 
             int child_pid0, child_pid1;
