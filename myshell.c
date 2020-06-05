@@ -114,53 +114,54 @@ int simple_shell(char **cmd, int count)
 
             out = err = -1;
             for ( k = i; k < count; k += 2) {
-                if (strcmp(cmd[k], "|") == 0) {
+                if (strcmp(cmd[k], "<") == 0) continue;
+                else if (strcmp(cmd[k], "|") == 0) {
                     return -1;
                 }
                 else if (strcmp(cmd[k], ">") == 0) {
                     if ((k + 1) >= count) {
-                        fprintf(stderr, "stdout failed in argument (>)\n"); return -1;
+                        fprintf(stderr, "stdout failed in argument (<)\n"); return -1;
                     } out = k + 1;
                     if ((fd_out = open(cmd[out], O_WRONLY | O_CREAT, 0600)) < 0) {
-                        fprintf(stderr, "dummy open() failed in argument (>)\n"); return -1;
+                        fprintf(stderr, "dummy open() failed in argument (<)\n"); return -1;
                     } close(fd_out);
                 }
                 else if (strcmp(cmd[k], "2>") == 0) {
                     if ((k + 1) >= count) {
-                        fprintf(stderr, "stderr failed in argument (2>)\n"); return -1;
+                        fprintf(stderr, "stderr failed in argument (<)\n"); return -1;
                     } err = k + 1;
                     if ((fd_err = open(cmd[err], O_WRONLY | O_CREAT, 0600)) < 0) {
-                        fprintf(stderr, "dummy open() failed in argument (2>)\n"); return -1;
+                        fprintf(stderr, "dummy open() failed in argument (<)\n"); return -1;
                     } close(fd_err);
                 }
                 else if (strcmp(cmd[k], ";") == 0) {
                     k += 1; break;
                 }
                 else {
-                    fprintf(stderr, "invalid argument is detected in argument (> or 2>)\n"); return -1;
+                    fprintf(stderr, "invalid argument is detected in argument (<)\n"); return -1;
                 }
             } i = k - 1;
 
             if ((child_pid = fork()) < 0) {
-                fprintf(stderr, "fork() failed in argument (> or 2>)\n"); return -1;
+                fprintf(stderr, "fork() failed in argument (<)\n"); return -1;
             }
             if (child_pid == 0) {
                 if (out >= 0) {
                     if ((fd_out = open(cmd[out], O_WRONLY | O_CREAT, 0600)) < 0) {
-                        fprintf(stderr, "open() failed in argument (>)\n"); return -1;
+                        fprintf(stderr, "open() failed in argument (<)\n"); return -1;
                     }
                     close(1); dup(fd_out); close(fd_out);
                 }
                 if (err >= 0) {
                     if ((fd_err = open(cmd[err], O_WRONLY | O_CREAT, 0600)) < 0) {
-                        fprintf(stderr, "open() failed in argument (2>)\n"); return -1;
+                        fprintf(stderr, "open() failed in argument (<)\n"); return -1;
                     }
                     close(2); dup(fd_err); close(fd_err);
                 }
                 close(0); dup(fd_in); close(fd_in);
 
                 execvp(arr[0], arr);
-                fprintf(stderr, "exec() failed in argument (> or 2>)\n"); return -1;
+                fprintf(stderr, "exec() failed in argument (<)\n"); return -1;
             } else {
                 if (bg_flag == 0)
                     waitpid(child_pid, &status, 0);
