@@ -27,7 +27,7 @@ void stderr_2 () {
 // > < | & 2> ;
 void simple_shell(char **cmd, int count)
 {
-    int i, j, temp, bg_flag, k = 0;
+    int i, j, temp, bg_flag, out, err, k = 0;
     int child_pid, status;
 
     if (strcmp(cmd[count - 1], "&") != 0) bg_flag = 0;
@@ -44,19 +44,18 @@ void simple_shell(char **cmd, int count)
                 arr[j] = cmd[k]; k++;
             } k = i + 1;
 
-            int out, err;
             out = err = -1;
             while (strcmp(cmd[k], ">") == 0 || strcmp(cmd[k], "2>") == 0 || strcmp(cmd[k], ";") == 0) {
-                if (strcmp(cmd[k], ">") == 0)
+                if (strcmp(cmd[k], ">") == 0) {
                     if (k + 1 >= count) {
                         printf("stdout failed in argument (>)\n"); return;
-                    }
-                    out = k + 1;
-                if (strcmp(cmd[k], "2>") == 0)
+                    } out = k + 1;
+                }
+                if (strcmp(cmd[k], "2>") == 0) {
                     if (k + 1 >= count) {
                         printf("stderr failed in argument (2>)\n"); return;
-                    }
-                    err = k + 1;
+                    } err = k + 1;
+                }
                 if (strcmp(cmd[k], ";") == 0) {
                     i = k; k += 1; break;
                 } k += 2;
@@ -84,22 +83,13 @@ void simple_shell(char **cmd, int count)
                 }
 
                 execvp(arr[0], arr);
-                printf("exec() failed in argument (>)\n"); return;
+                printf("exec() failed in argument (> or 2>)\n"); return;
             } else {
                 if (bg_flag == 0)
                     waitpid(child_pid, &status, 0);
                 else if (bg_flag == 1)
                     waitpid(child_pid, &status, WNOHANG);
             }
-        }
-
-        if (strcmp(cmd[i], "2>") == 0) {
-            temp = i - k;
-            char *arr[temp + 1];
-            arr[temp] = NULL;
-            for (j = 0; j < temp; j++) {
-                arr[j] = cmd[k]; k++;
-            } k = i + 1;
         }
 
         if (strcmp(cmd[i], "<") == 0) {
