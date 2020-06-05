@@ -11,6 +11,9 @@
 #include <stdlib.h>
 #include <string.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
 
 void stdout_1 ()
 {
@@ -46,12 +49,12 @@ void simple_shell(char **cmd, int count)
             while (strcmp(cmd[k], ">") == 0 || strcmp(cmd[k], "2>") == 0 || strcmp(cmd[k], ";") == 0) {
                 if (strcmp(cmd[k], ">") == 0)
                     if (k + 1 >= count) {
-                        printf("stdout() failed in argument (>)\n"); return;
+                        printf("stdout failed in argument (>)\n"); return;
                     }
                     out = k + 1;
                 if (strcmp(cmd[k], "2>") == 0)
                     if (k + 1 >= count) {
-                        printf("stdout() failed in argument (>)\n"); return;
+                        printf("stderr failed in argument (2>)\n"); return;
                     }
                     err = k + 1;
                 if (strcmp(cmd[k], ";") == 0) {
@@ -61,23 +64,23 @@ void simple_shell(char **cmd, int count)
             }
 
             if ((child_pid = fork()) < 0) {
-                printf("fork() failed in argument (>)\n"); return;
+                printf("fork() failed in argument (> or 2>)\n"); return;
             }
             if (child_pid == 0) {
-                FILE *fd_out, *fd_err;
+                int fd_out, fd_err;
                 if (out >= 0) {
-                    if ((fd_out = fopen(cmd[out], "w")) == NULL) {
-                        printf("fopen() failed in argument (>)\n");
+                    if ((fd_out = open(cmd[out], O_WRONLY)) < 0) {
+                        printf("open() failed in argument (>)\n");
                         return;
                     }
-                    close(stdout); dup(fd_out); close(fd_out);
+                    close(1); dup(fd_out); close(fd_out);
                 }
                 if (err >= 0) {
-                    if ((fd_err = fopen(cmd[err], "w")) == NULL) {
-                        printf("fopen() failed in argument (>)\n");
+                    if ((fd_err = open(cmd[err], O_WRONLY)) < 0) {
+                        printf("open() failed in argument (2>)\n");
                         return;
                     }
-                    clode(stderr); dup(fd_err); close(fd_err);
+                    close(2); dup(fd_err); close(fd_err);
                 }
 
                 execvp(arr[0], arr);
