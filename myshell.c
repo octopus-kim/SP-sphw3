@@ -67,13 +67,13 @@ int simple_shell(char **cmd, int count)
             }
             if (child_pid == 0) {
                 if (out >= 0) {
-                    if ((fd_out = open(cmd[out], O_WRONLY | O_CREAT, 644)) < 0) {
+                    if ((fd_out = open(cmd[out], O_WRONLY | O_CREAT, 0644)) < 0) {
                         printf("open() failed in argument (>)\n"); return -1;
                     }
                     close(1); dup(fd_out); close(fd_out);
                 }
                 if (err >= 0) {
-                    if ((fd_err = open(cmd[err], O_WRONLY | O_CREAT, 644)) < 0) {
+                    if ((fd_err = open(cmd[err], O_WRONLY | O_CREAT, 0644)) < 0) {
                         printf("open() failed in argument (2>)\n"); return -1;
                     }
                     close(2); dup(fd_err); close(fd_err);
